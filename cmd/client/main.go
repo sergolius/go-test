@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
-	"go-test/csv-reader"
+	"io"
 	"log"
 
 	"google.golang.org/grpc"
 
+	"go-test/csv-reader"
 	pb "go-test/proto"
 )
 
 func main() {
-	r, err := csv_reader.NewCSVReader("../../data/data.csv")
+	flag.Parse()
+	filePath := flag.Arg(0)
+
+	r, err := csv_reader.NewCSVReader(filePath) // "../../data/data.csv"
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,11 +32,14 @@ func main() {
 	c := pb.NewServiceClient(conn)
 
 	var index int64
-	for ; index < 10; index++ {
+	for {
+		index++
 		m := make(map[string]string)
 
-		if err := r.Parse(&m); err != nil {
+		if err := r.Parse(&m); err != nil && err != io.EOF {
 			log.Fatal(index, err)
+		} else if err == io.EOF {
+			break
 		}
 
 		if _, err := c.SendMessage(
@@ -41,6 +49,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("%#v \n", m)
+		fmt.Printf("Record with id %q sent \n", m["id"])
 	}
 }

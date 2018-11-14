@@ -1,0 +1,7 @@
+mysql:
+  host: localhost
+  port: 33060
+  user: root
+  password: root
+  dbname: gotest
+  table: gotest
