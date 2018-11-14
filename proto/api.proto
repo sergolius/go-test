@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ReadAndSaveService;
+
+import "google/protobuf/empty.proto";
+
+service Service {
+    rpc SendMessage (Message) returns (google.protobuf.Empty);
+}
+
+// ==============Attributes================
+message Message {
+    int64 index = 1;
+    map<string, string> data = 2;
+}
